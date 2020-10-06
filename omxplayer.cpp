@@ -114,6 +114,7 @@ bool              m_has_audio           = false;
 bool              m_has_subtitle        = false;
 bool              m_gen_log             = false;
 bool              m_loop                = false;
+bool              m_start_paused        = false;
 
 enum{ERROR=-1,SUCCESS,ONEBYTE};
 
@@ -565,6 +566,7 @@ int main(int argc, char *argv[])
   const int advanced_opt    = 0x211;
   const int aspect_mode_opt = 0x212;
   const int crop_opt        = 0x213;
+  const int start_paused    = 0x214;
   const int http_cookie_opt = 0x300;
   const int http_user_agent_opt = 0x301;
   const int lavfdopts_opt   = 0x400;
@@ -631,6 +633,7 @@ int main(int argc, char *argv[])
     { "user-agent",   required_argument,  NULL,          http_user_agent_opt },
     { "lavfdopts",    required_argument,  NULL,          lavfdopts_opt },
     { "avdict",       required_argument,  NULL,          avdict_opt },
+    { "start-paused", no_argument,        NULL,          start_paused },
     { 0, 0, 0, 0 }
   };
 
@@ -904,6 +907,9 @@ int main(int argc, char *argv[])
         break;
       case avdict_opt:
         m_avdict = optarg;
+        break;
+      case start_paused:
+        m_start_paused = true;
         break;
       case 0:
         break;
@@ -1719,8 +1725,19 @@ int main(int argc, char *argv[])
       {
         if (m_av_clock->OMXIsPaused())
         {
-          CLog::Log(LOGDEBUG, "Resume %.2f,%.2f (%d,%d,%d,%d) EOF:%d PKT:%p\n", audio_fifo, video_fifo, audio_fifo_low, video_fifo_low, audio_fifo_high, video_fifo_high, m_omx_reader.IsEof(), m_omx_pkt);
-          m_av_clock->OMXResume();
+          if(m_start_paused)
+          {
+            CLog::Log(LOGDEBUG, "start-paused(%d)\n", m_start_paused);
+            m_av_clock->OMXResume();
+            m_Pause=true;
+            m_start_paused=false;
+            m_av_clock->OMXPause();
+		  }
+          else
+          {
+            CLog::Log(LOGDEBUG, "Resume %.2f,%.2f (%d,%d,%d,%d) EOF:%d PKT:%p\n", audio_fifo, video_fifo, audio_fifo_low, video_fifo_low, audio_fifo_high, video_fifo_high, m_omx_reader.IsEof(), m_omx_pkt);
+            m_av_clock->OMXResume();
+          }
         }
       }
       else if (m_Pause || audio_fifo_low || video_fifo_low)

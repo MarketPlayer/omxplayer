@@ -7,7 +7,7 @@ standalone.
 
 ## DOWNLOADING
 
-    git clone https://github.com/popcornmix/omxplayer.git
+    git clone https://github.com/MarketPlayer/omxplayer
 
 ## HELP AND DOCS
 
@@ -30,22 +30,6 @@ Build with
 Install with
     
     sudo make install
-
-## CROSS COMPILING
-
-You need the content of your sdcard somewhere mounted or copied. There might be
-development headers to install on the running Pi system for the crosscompiling.
-
-Edit Makefile.include and change the settings according your locations.
-
-    make ffmpeg
-    make
-    make dist
-
-Installing OMXPlayer
-
-You may want to specify a valid font path inside the `omxplayer` shell script.
-Copy over `omxplayer-dist/*` to the Pi `/`.
 
 ## SYNOPSIS
 
@@ -112,6 +96,7 @@ Usage: omxplayer [OPTIONS] [FILE]
         --user-agent 'ua'       Send specified User-Agent as part of HTTP requests
         --lavfdopts 'opts'      Options passed to libavformat, e.g. 'probesize:250000,...'
         --avdict 'opts'         Options passed to demuxer, e.g., 'rtsp_transport:tcp,...'
+        --start-paused          Immediately pause the video after loading, will wait for dbus or key command to play
 
 For example:
 
